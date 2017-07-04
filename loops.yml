@@ -1,0 +1,13 @@
+--- # Playbook to demonstrate loops
+- hosts: local
+  user: ansible
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  tasks:
+   - name: Add multiple users using loops
+     user: name={{ item }} state=present
+     with_items:
+      - user1
+      - user2
+      - user3

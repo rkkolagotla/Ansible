@@ -1,0 +1,15 @@
+--- #Playbook for when demonstration
+- hosts: [ debian, webserver]
+  user: ansible
+  sudo: yes
+  connection: ssh
+  vars_files:
+   - conf/copyright.yml
+   - conf/webdefaults.yml
+  tasks:
+   - name: install httpd module on debian
+     command: apt-get remove apache2 -y
+     when: ansible_os_family == "Debian"
+   - name: install httpd module on linux
+     command: yum remove httpd -y
+     when: ansible_os_family == "RedHat"

@@ -1,0 +1,4 @@
+---
+# defaults file for percona-mysql
+# Define root password for percona server
+mysql_root_password: el@nadmin12 

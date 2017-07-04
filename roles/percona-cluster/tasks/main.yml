@@ -1,0 +1,63 @@
+--- # Install Percona-MySql database
+- name: Add Percona repository key
+  become: yes
+  become_user: root
+  apt_key: keyserver=keys.gnupg.net id=9334A25F8507EFA5 state=present
+
+- name: Add Percona repository
+  become: yes
+  become_user: root
+  apt: deb="https://repo.percona.com/apt/percona-release_0.1-4.trusty_all.deb"
+
+- name: Update apt
+  become: yes
+  become_user: root
+  apt: update_cache=yes
+
+- name: Install Percona MySQL Server
+  become: yes
+  become_user: root
+  action: apt pkg={{ item }} state=present
+  with_items:
+   - percona-server-server-5.7
+   - percona-server-client-5.7
+   - percona-toolkit
+   - percona-xtrabackup
+   - python-mysqldb
+  environment:
+   DEBIAN_FRONTEND: noninteractive
+
+- name: Create fnv1a_64
+  become: yes
+  become_user: root
+  shell: /usr/bin/mysql -e "CREATE FUNCTION fnv1a_64 RETURNS INTEGER SONAME 'libfnv1a_udf.so'" && touch /var/log/libfnv1a_udf.so.done creates=/var/log/libfnv1a_udf.so.done
+
+- name: Create fnv_64
+  become: yes
+  become_user: root
+  shell: /usr/bin/mysql -e "CREATE FUNCTION fnv_64 RETURNS INTEGER SONAME 'libfnv_udf.so'" && touch /var/log/libfnv_udf.so.done creates=/var/log/libfnv_udf.so.done
+
+- name: Create murmur_hash
+  become: yes
+  become_user: root
+  shell: /usr/bin/mysql -e "CREATE FUNCTION murmur_hash RETURNS INTEGER SONAME 'libmurmur_udf.so'" && touch /var/log/libmurmur_udf.so.done creates=/var/log/libmurmur_udf.so.done
+
+- name: Update Percona MySQL Server root password
+  become: yes
+  become_user: root
+  mysql_user: name=root host=dbservers password={{ mysql_root_password }} login_user=root login_password={{ mysql_root_password }} check_implicit_admin=yes
+ #mysql_user: name=root host={{ item }} password={{ mysql_root_password }} login_user=root login_password={{ mysql_root_password }} check_implicit_admin=yes
+ #with_items:
+ #  - "{{ ansible_hostname }}"
+ #  - 127.0.0.1
+ #  - ::1
+ #  - localhost
+
+- name: Remove test database
+  become: yes
+  become_user: root
+  mysql_db: name=test state=absent login_host=localhost login_user=root login_password={{ mysql_root_password }}
+
+- name: Copy .my.cnf file with root password credentials
+  template: src=templates/.my.cnf dest=/root/.my.cnf owner=root mode=0600
+

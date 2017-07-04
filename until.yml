@@ -1,0 +1,16 @@
+--- # Playbook to explain until
+- hosts: webserver
+  user: ansible
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  tasks:
+   - name: Install httpd 
+     yum: pkg=httpd state=latest
+   - name: verify service is running...
+     command: systemctl status httpd
+     register: result
+     until: result.stdout.find("active (running)") != -1
+     retries: 5
+     delay: 5
+   - debug: var=result 

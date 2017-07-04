@@ -1,0 +1,14 @@
+--- # Example playbook for prompt
+- hosts: debian
+  user: ansible
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  vars_prompt:
+   - name: pkgname
+     prompt: Enter package name to install-
+     private: no
+     default: telnet
+  tasks:
+   - name: Installing requested package
+     apt: pkg={{ pkgname }} state=latest

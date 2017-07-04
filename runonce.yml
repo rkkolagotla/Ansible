@@ -1,0 +1,12 @@
+--- #Runonce ansible code
+- hosts: all
+  user: ansible
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  tasks:
+   - name: Run update command and log it
+     raw: /usr/bin/uptime >> /home/ansible/uptime.log
+   - name: Run the dir and run once
+     raw: ls -al /var >> /home/ansible/dir.list
+     run_once: true

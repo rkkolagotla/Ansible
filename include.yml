@@ -1,0 +1,8 @@
+--- # Example for Include statement
+- hosts: appserver
+  user: ansible
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  tasks:
+   - include: plays/pakages.yml
